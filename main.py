@@ -30,7 +30,7 @@ def set_info(detec):
             cv2.line(frame1, (25, pos_linha), (1200, pos_linha), (0, 127, 255), 3)
             detec.remove((x, y))
             console.info("Carros detectados até o momento: " + str(carros))
-
+ 
 
 def show_info(frame1, dilatada):
     text = f'Carros: {carros}'
@@ -42,7 +42,7 @@ def show_info(frame1, dilatada):
 
 carros = caminhoes = 0
 cap = cv2.VideoCapture('https://quantificacao.s3-sa-east-1.amazonaws.com/video.mp4')
-subtracao = cv2.bgsegm.createBackgroundSubtractorMOG()  # Pega o fundo e subtrai do que está se movendo
+subtracao = cv2.createBackgroundSubtractorMOG2()  # Pega o fundo e subtrai do que está se movendo
 
 while True:
     ret, frame1 = cap.read()  # Pega cada frame do vídeo
