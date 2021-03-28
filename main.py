@@ -2,9 +2,33 @@ import cv2
 import numpy as np
 from time import sleep
 from constantes import *
+from kombu import Exchange
+from kombu import Producer
+from kombu import Connection
+import pickle
+from datetime import datetime as dt 
+
 
 from console_logging.console import Console
 console = Console()
+rabbit_url = "amqp://guest:guest@192.168.0.108:5672//"
+
+def connect_rabbitmq():
+    # Connect to RabbitMQ
+    conn = Connection(rabbit_url)
+    channel = conn.channel()
+ 
+    exchange = Exchange("contador-carro-exchange", type="direct", delivery_mode=1)
+    producer = Producer(
+        exchange=exchange, channel=channel, routing_key="contador-carro-exchange"
+    )
+    
+    queue = Queue(name="contador-carro-exchange", exchange=exchange, routing_key="contador-carro-exchange")
+    queue.maybe_bind(conn)
+    queue.declare()
+
+    return producer
+
 
 
 def pega_centro(x, y, largura, altura):
@@ -24,12 +48,30 @@ def pega_centro(x, y, largura, altura):
 
 def set_info(detec):
     global carros
+    producer = connect_rabbitmq()
+
     for (x, y) in detec:
         if (pos_linha + offset) > y > (pos_linha - offset):
             carros += 1
             cv2.line(frame1, (25, pos_linha), (1200, pos_linha), (0, 127, 255), 3)
             detec.remove((x, y))
             console.info("Carros detectados até o momento: " + str(carros))
+            data = {
+                        "id_camera": "2f784c6a-4343-479b-94b8-addb52482912",
+                        "data_": "/".join(str(dt.now()).split()[0].split("-")),
+                        "dt": str(dt.now()).split(".")[0],
+                        "evento": 1
+                    }
+            console.log(data)
+            imagePickle = pickle.dumps(data)
+
+                    # Catch timeout error
+            try:
+               producer.publish(imagePickle, content_encoding='binary')
+            except TimeoutError:
+               print("Timeout at ", datetime.now())
+               producer = connect_rabbitmq()
+
  
 
 def show_info(frame1, dilatada):
@@ -43,8 +85,10 @@ def show_info(frame1, dilatada):
 carros = caminhoes = 0
 cap = cv2.VideoCapture('https://quantificacao.s3-sa-east-1.amazonaws.com/video.mp4')
 subtracao = cv2.createBackgroundSubtractorMOG2()  # Pega o fundo e subtrai do que está se movendo
+    # Setup
 
 while True:
+  
     ret, frame1 = cap.read()  # Pega cada frame do vídeo
     tempo = float(1 / delay)
     sleep(tempo)  # Dá um delay entre cada processamento

@@ -8,6 +8,7 @@ authors = ["Your Name <you@example.com>"]
 python = "^3.8"
 opencv-python = "^4.5.1"
 console-logging = "^0.0.5"
+kombu = "^5.0.2"
 
 [tool.poetry.dev-dependencies]
 
