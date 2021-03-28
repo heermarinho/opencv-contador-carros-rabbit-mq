@@ -5,7 +5,11 @@ from console_logging.console import Console
 from kombu import Connection, Exchange, Queue
 from kombu.mixins import ConsumerMixin
 
-from lgetter.Cartracking.CarTracker import CarTracker
+import dataset 
+
+# https://dataset.readthedocs.io/en/latest/ setar para falar com banco
+db = dataset.connect('mysql://root:asdqwe123@192.168.0.108:49153/COUNTER_TBL')
+tabela = db['EVENTOS']
 
 console = Console()
 queue = "contador-carro-exchange"
@@ -24,16 +28,11 @@ class Worker(ConsumerMixin):
     def __init__(self, connection, queues):
         self.connection = connection
         self.queues = queues
-        self.car_tracker = CarTracker()
-
-    def process_cartracking(self, frame, operation, camera):
-        _, moving_car = self.car_tracker.track(frame,operation, camera)
-
-        return moving_car
 
     def on_message(self, body, message):
-        json_input = pickle.loads(body)
-        print(json_input)
+        data = pickle.loads(body)
+        print(data['id_camera'])
+        tabela.insert(dict(id_camera=data['id_camera'], data_=data['data_'], dt=data['dt'],evento=data['evento'])) 
         message.ack()
 
     def get_consumers(self, Consumer, channel):

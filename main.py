@@ -5,6 +5,7 @@ from constantes import *
 from kombu import Exchange
 from kombu import Producer
 from kombu import Connection
+from kombu import Queue
 import pickle
 from datetime import datetime as dt 
  
