@@ -17,7 +17,7 @@ def connect_rabbitmq():
     # Connect to RabbitMQ
     conn = Connection(rabbit_url)
     channel = conn.channel()
- 
+  
     exchange = Exchange("contador-carro-exchange", type="direct", delivery_mode=1)
     producer = Producer(
         exchange=exchange, channel=channel, routing_key="contador-carro-exchange"
