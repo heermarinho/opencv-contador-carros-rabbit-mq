@@ -6,7 +6,7 @@ from kombu import Connection, Exchange, Queue
 from kombu.mixins import ConsumerMixin
 
 import dataset 
-
+print("import dataset heheheheh")
 # https://dataset.readthedocs.io/en/latest/ setar para falar com banco
 db = dataset.connect('mysql://root:asdqwe123@192.168.0.108:49153/COUNTER_TBL')
 tabela = db['EVENTOS']
