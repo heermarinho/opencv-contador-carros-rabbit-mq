@@ -101,7 +101,7 @@ while True:
         5, 5))  # Cria uma matriz 5x5, em que o formato da matriz entre 0 e 1 forma uma elipse dentro
     dilatada = cv2.morphologyEx(dilat, cv2.MORPH_CLOSE, kernel)  # Tenta preencher todos os "buracos" da imagem
     dilatada = cv2.morphologyEx(dilatada, cv2.MORPH_CLOSE, kernel)
-
+    print(dt.now())
     contorno, img = cv2.findContours(dilatada, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cv2.line(frame1, (25, pos_linha), (1200, pos_linha), (255, 127, 0), 3)
     for (i, c) in enumerate(contorno):
